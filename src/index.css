@@ -1,0 +1,52 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Syne", sans-serif;
+
+  --color-brand-purple: #7C3AED;
+  --color-brand-yellow: #FACC15;
+  --color-brand-black: #050505;
+  
+  --color-bg-primary: var(--bg-primary);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-border-subtle: var(--border-subtle);
+}
+
+:root {
+  --bg-primary: #050505;
+  --text-primary: #FFFFFF;
+  --text-secondary: #9CA3AF;
+  --border-subtle: rgba(255, 255, 255, 0.1);
+}
+
+.light {
+  --bg-primary: #F9FAFB;
+  --text-primary: #050505;
+  --text-secondary: #4B5563;
+  --border-subtle: rgba(0, 0, 0, 0.1);
+}
+
+@layer base {
+  body {
+    @apply bg-bg-primary text-text-primary font-sans selection:bg-brand-yellow selection:text-brand-black transition-colors duration-300;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display font-extrabold tracking-tight text-text-primary;
+  }
+}
+
+.glass {
+  @apply bg-white/5 backdrop-blur-md border border-border-subtle;
+}
+
+.light .glass {
+  @apply bg-white/40 backdrop-blur-md border border-brand-black/5;
+}
+
+.text-gradient {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-brand-purple to-brand-yellow;
+}
