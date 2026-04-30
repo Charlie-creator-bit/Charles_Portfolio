@@ -52,7 +52,7 @@ const ContactForm = () => {
               </div>
               <div>
                 <h4 className="text-lg font-bold mb-1">Call Me</h4>
-                <p className="text-text-secondary">+233 (0) XX XXX XXXX</p>
+                <p className="text-text-secondary">0556824948</p>
               </div>
             </div>
           </div>
