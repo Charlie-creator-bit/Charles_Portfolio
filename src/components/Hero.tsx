@@ -1,9 +1,10 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { ArrowRight, ChevronDown } from 'lucide-react';
+import profileImg from '../Charles.jpg';
 
 const Hero = () => {
-  const profileImageUrl = "/profile.jpg";
+  const profileImageUrl = profileImg;
 
   return (
     <section id="home" className="min-h-screen flex flex-col justify-center items-center px-6 pt-20">
