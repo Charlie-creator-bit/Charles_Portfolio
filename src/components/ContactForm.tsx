@@ -1,8 +1,56 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { Send, Mail, MapPin, Phone } from 'lucide-react';
+import { Send, Mail, MapPin, Phone, Loader2 } from 'lucide-react';
 
 const ContactForm = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: ''
+  });
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus('loading');
+    setErrorMessage('');
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to send message');
+      }
+
+      setStatus('success');
+      setFormData({ name: '', email: '', subject: '', message: '' });
+      
+      // Reset success status after 5 seconds
+      setTimeout(() => setStatus('idle'), 5000);
+    } catch (err: any) {
+      console.error('Contact Error:', err);
+      setStatus('error');
+      setErrorMessage(err.message || 'Something went wrong. Please try again.');
+    }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }));
+  };
+
   return (
     <section id="contact" className="py-24 px-6 bg-bg-primary relative overflow-hidden">
       {/* Background Glow */}
@@ -62,13 +110,17 @@ const ContactForm = () => {
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
             className="space-y-6 glass p-8 md:p-10 rounded-[2rem]"
-            onSubmit={(e) => e.preventDefault()}
+            onSubmit={handleSubmit}
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-text-secondary">Your Name</label>
                 <input 
                   type="text" 
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
                   placeholder="John Doe"
                   className="w-full px-6 py-4 rounded-2xl bg-text-primary/5 border border-border-subtle focus:border-brand-purple outline-none transition-all"
                 />
@@ -77,6 +129,10 @@ const ContactForm = () => {
                 <label className="text-sm font-medium text-text-secondary">Email Address</label>
                 <input 
                   type="email" 
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
                   placeholder="john@example.com"
                   className="w-full px-6 py-4 rounded-2xl bg-text-primary/5 border border-border-subtle focus:border-brand-purple outline-none transition-all"
                 />
@@ -86,6 +142,10 @@ const ContactForm = () => {
               <label className="text-sm font-medium text-text-secondary">Subject</label>
               <input 
                 type="text" 
+                name="subject"
+                value={formData.subject}
+                onChange={handleChange}
+                required
                 placeholder="Project Inquiry"
                 className="w-full px-6 py-4 rounded-2xl bg-text-primary/5 border border-border-subtle focus:border-brand-purple outline-none transition-all"
               />
@@ -94,12 +154,44 @@ const ContactForm = () => {
               <label className="text-sm font-medium text-text-secondary">Message</label>
               <textarea 
                 rows={5}
+                name="message"
+                value={formData.message}
+                onChange={handleChange}
+                required
                 placeholder="How can I help you?"
                 className="w-full px-6 py-4 rounded-2xl bg-text-primary/5 border border-border-subtle focus:border-brand-purple outline-none transition-all resize-none"
               ></textarea>
             </div>
-            <button className="w-full py-5 bg-brand-purple hover:bg-brand-purple/80 text-white rounded-2xl font-bold flex items-center justify-center gap-2 transition-all group">
-              Send Message <Send size={20} className="group-hover:translate-x-1 transition-transform" />
+            
+            {status === 'success' && (
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="p-4 rounded-xl bg-green-500/10 border border-green-500/20 text-green-500 text-sm font-medium"
+              >
+                Thank you! Your message has been sent to my phone via SMS.
+              </motion.div>
+            )}
+
+            {status === 'error' && (
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-sm font-medium"
+              >
+                {errorMessage}
+              </motion.div>
+            )}
+
+            <button 
+              disabled={status === 'loading'}
+              className="w-full py-5 bg-brand-purple hover:bg-brand-purple/80 text-white rounded-2xl font-bold flex items-center justify-center gap-2 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {status === 'loading' ? (
+                <>Sending... <Loader2 size={20} className="animate-spin" /></>
+              ) : (
+                <>Send Message <Send size={20} className="group-hover:translate-x-1 transition-transform" /></>
+              )}
             </button>
           </motion.form>
         </div>
